@@ -1,6 +1,6 @@
 [project]
-name = "moebius"
-version = "0.5"
+name = "mobius"
+version = "0.7"
 description = "Python package for optimizing peptide sequences using Bayesian optimization (BO)"
 authors = [
     { name = "Jerome Eberhardt", email = "jerome.eberhardt@unibas.ch" },
@@ -57,8 +57,18 @@ dependencies = [
 "Documentation" = "https://mobius.readthedocs.io/en/latest/"
 "Source" = "https://git.scicore.unibas.ch/schwede/mobius"
 
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+
 [tool.setuptools]
 py-modules = ['mobius']
+include-package-data = true
+
+[tool.setuptools.package-data]
+mobius = ["data/**/*"]
+
 
 [build-system]
 requires = ["setuptools >= 40.6.0", "wheel"]

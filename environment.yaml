@@ -31,7 +31,10 @@ dependencies:
   - sphinx_rtd_theme
   - tqdm
   - transformers
-  - pytorch=*=*cuda*
+#  - pytorch=*=*cuda*
+  - pytorch=2.4.0=*cuda*
+  - torchvision=0.19.0=*cuda*  # Matches PyTorch 2.4.0 ecosystem
+  - torchaudio=2.4.0=*cuda*
   - pip:
     - mhfp
     - meeko
