@@ -1,45 +1,59 @@
-FROM nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04 as BASE
+#FROM nvidia/cuda:13.0.3-cudnn-devel-ubuntu22.04
+FROM pytorch/pytorch:2.4.0-cuda12.4-cudnn9-devel
 
-RUN apt update && \
-    apt upgrade -y
-
-RUN apt install -y --no-install-recommends ca-certificates wget unzip python3 pip python3-pip vim
-
-# with 12.4 ->
-RUN pip3 install torch torchvision torchaudio
-RUN pip3 install torchinfo
-
-#RUN rm -rf /var/lib/apt/lists/* \
-#    && apt-get autoremove -y \
-#    && apt-get clean
-
-ENV APP=/app
-RUN mkdir -p $APP
-WORKDIR $APP
-
-RUN apt install -y --no-install-recommends python3-dev
-RUN apt install -y --no-install-recommends git
-
-# upgrade pip & install
-RUN pip3 install --upgrade pip
-
-#RUN pip3 install botorch biotite==0.41 fair-esm grakel gpytorch matplotlib numba numpy numpydoc pandas parmed
-#RUN pip3 install openmm rdkit seaborn sentencepiece scikit-learn scipy sphinx==6.2.1 sphinx_rtd_theme tqdm transformers mhfp meeko ray pymoo mapchiral vina
-COPY ./requirements.txt .
-RUN pip3 install -r requirements.txt
-
-RUN git clone https://github.com/prody/ProDy.git && cd ProDy && python3 setup.py build_ext --inplace --force && pip install -Ue .
-
-COPY . $APP
-RUN pip install -e .
-
-#RUN python3 setup.py install
+#ENV DEBIAN_FRONTEND=noninteractive
+#ENV PYTHONUNBUFFERED=1
+##ENV PIP_NO_CACHE_DIR=1
 #
-##RUN apt install -y --no-install-recommends inetutils-ping
-#
-#RUN addgroup --gid 9999 --system app && adduser --system --uid 9999 --group app
-#RUN chown -R app:app /home/app
-#ENV APP_HOME=/home/app
-#WORKDIR $APP_HOME
-#RUN chown -R app:app $APP_HOME
-#USER app
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git
+#    python3 \
+#    python3-dev \
+#    python3-pip \
+#    git \
+#    build-essential \
+#    ca-certificates \
+#    curl \
+#    wget \
+#	bash
+#    #bash \
+    #&& rm -rf /var/lib/apt/lists/*
+
+#COPY gpu_requirements.txt .
+#RUN pip install -r gpu_requirements.txt
+
+#COPY mobius_jupyter_requirements.txt .
+#RUN pip install -r mobius_jupyter_requirements.txt --no-build-isolation
+
+
+WORKDIR /opt
+
+#RUN python3 -m pip install --upgrade pip setuptools
+RUN python3 -m pip install jupyter-packaging versioneer
+#RUN python3 -m pip install nglview
+
+COPY requirements.txt .
+RUN python -m pip install -r requirements.txt --no-build-isolation
+
+
+COPY mobius /opt/
+#RUN git clone https://git.scicore.unibas.ch/schwede/mobius.git
+#WORKDIR /opt/mobius
+#RUN pip install .
+
+RUN python -m pip install . 
+WORKDIR /
+
+RUN pip install jupyterlab matplotlib scikit-learn
+## Expose the default Jupyter port
+EXPOSE 8888
+
+## Start JupyterLab on container launch
+## --ip=0.0.0.0 allows connections from outside the container
+## --allow-root allows it to run if you don't map a custom non-root user
+CMD ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root", "--NotebookApp.token=''"]
+
+
+# docker build -f GPU.Dockerfile -t gpu-mobius .
+# docker run --gpus all -it --rm gpu-mobius /bin/bash
+# docker run --gpus all -it --rm -p 8888:8888 -v "$(pwd)":/workspace gpu-mobius
