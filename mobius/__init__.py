@@ -15,7 +15,7 @@ from .planner import Planner
 from .transforms import SimplePolymerDescriptors
 from .transforms import MHFingerprint, Map4Fingerprint, MorganFingerprint
 from .transforms import Graph
-from .optimizers import SequenceGA, RandomGA
+from .optimizers import SequenceGA, CachedSequenceGA, RandomGA
 from .optimizers import Pool
 from .surrogate_models import GPModel, GPLLModel, CachedGPLLModel, DummyModel, RFModel, GPGKModel, GPGNNModel
 from .embeddings import ProteinEmbedding, ChemicalEmbedding, CachedProteinEmbedding
@@ -47,7 +47,7 @@ __all__ = ['VirtualTarget', 'ForceField',
            'MHFingerprint', 'Map4Fingerprint', 'MorganFingerprint', 
            'SimplePolymerDescriptors',
            'Graph',
-           'SequenceGA', 'RandomGA', 'Pool',
+           'SequenceGA', 'CachedSequenceGA', 'RandomGA', 'Pool',
            'monomers_scanning', 'alanine_scanning', 'random_monomers_scanning', 'properties_scanning', 
            'scrumbled_scanning', 'homolog_scanning',
            'RosettaScorer', 'DamiettaScorer', 'InverseFolding', 'VinaScorer',
