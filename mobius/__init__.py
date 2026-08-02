@@ -17,7 +17,7 @@ from .transforms import MHFingerprint, Map4Fingerprint, MorganFingerprint
 from .transforms import Graph
 from .optimizers import SequenceGA, RandomGA
 from .optimizers import Pool
-from .surrogate_models import GPModel, GPLLModel, DummyModel, RFModel, GPGKModel, GPGNNModel
+from .surrogate_models import GPModel, GPLLModel, CachedGPLLModel, DummyModel, RFModel, GPGKModel, GPGNNModel
 from .embeddings import ProteinEmbedding, ChemicalEmbedding, CachedProteinEmbedding
 from .generators import monomers_scanning, alanine_scanning, random_monomers_scanning, properties_scanning, scrumbled_scanning, homolog_scanning
 from .kernels import TanimotoSimilarityKernel, CosineSimilarityKernel
