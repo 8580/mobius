@@ -163,7 +163,7 @@ gpmodel = CachedGPLLModel(kernel=RBFKernel(), pretrained_model=plm,
 print(plm.backend_name)       # 'esm2'
 print(plm.cache_info())
 # after a round: max_forward_batch must never exceed embed_batch_size
-
+```
 
 
 ## The stock multi-objective bug
