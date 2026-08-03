@@ -20,5 +20,5 @@ docker run --network=privatenet --runtime=nvidia --gpus all -v $(pwd)/models:/ho
 
 
 ```bash
-docker run --gpus all -it --rm -p 8888:8888 -v "$(pwd)":/workspace gpu-mobius
+docker run --gpus all -it --rm -p 8888:8888 -v "$(pwd)":/workspace mobius-gpu
 ```

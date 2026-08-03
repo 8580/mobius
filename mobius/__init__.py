@@ -39,7 +39,7 @@ __all__ = ['VirtualTarget', 'ForceField',
            'Mobius',
            'Planner',
            'GPModel', 'GPLLModel', 'DummyModel', 'RFModel', 'GPGKModel', 'GPGNNModel',
-           'ProteinEmbedding', 'ChemicalEmbedding',, 'CachedProteinEmbedding'
+           'ProteinEmbedding', 'ChemicalEmbedding', 'CachedProteinEmbedding',
            'TanimotoSimilarityKernel', 'CosineSimilarityKernel',
            'ExpectedImprovement', 'LogExpectedImprovement',
            'PosteriorMean', 'PosteriorStandardDeviation', 
