@@ -7,6 +7,7 @@
 from .inverse_folding import InverseFolding
 from .damietta import DamiettaScorer
 from .rosetta import RosettaScorer
-from .vina import VinaScorer
+#from .vina import VinaScorer
 
-__all__ = ['DamiettaScorer', 'InverseFolding', 'RosettaScorer', 'VinaScorer']
+#__all__ = ['DamiettaScorer', 'InverseFolding', 'RosettaScorer', 'VinaScorer']
+__all__ = ['DamiettaScorer', 'InverseFolding', 'RosettaScorer']

@@ -156,12 +156,19 @@ class ProteinEmbedding:
         self._lora_alpha = lora_alpha
         self._padding_length = padding_length
         self._add_extra_space = add_extra_space
+        #TRAG Hax for output layers on ESM...
+        self._repr_layers = 33
 
         # https://github.com/google/sentencepiece?tab=readme-ov-file#whitespace-is-treated-as-a-basic-symbol
         meta_symbol = u"\u2581"
 
         if 'esm' in pretrained_model_name:
             self._model_type = 'esm'
+            if 't36' in pretrained_model_name:
+                self._repr_layers = 36
+            elif 't30' in pretrained_model_name:
+                self._repr_layers = 30
+                
             self._model, alphabet = esm.pretrained.load_model_and_alphabet(pretrained_model_name)
             self._tokenizer = BatchConverter(alphabet)
             # Get BOS, EOS and PAD tokens
@@ -368,8 +375,10 @@ class ProteinEmbedding:
         are_sequences_all_same_length = bool((sequence_mask == sequence_mask[0]).all())
 
         if self._model_type == 'esm':
-            results = self._model(tokenized_sequences, repr_layers=[33])
-            embeddings = results['representations'][33]
+            #results = self._model(tokenized_sequences, repr_layers=[33])
+            #embeddings = results['representations'][33]
+            results = self._model(tokenized_sequences, repr_layers=[self._repr_layers])
+            embeddings = results['representations'][self._repr_layers]
         else:
             # Make it compatible with T5EncoderModel and T5ForConditionalGeneration models
             model_arguments = inspect.getargspec(self._model)[0]
