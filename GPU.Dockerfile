@@ -33,6 +33,6 @@ EXPOSE 8888
 ## --allow-root allows it to run if you don't map a custom non-root user
 CMD ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root", "--NotebookApp.token=''"]
 
-## docker build -f GPU.Dockerfile -t gpu-mobius .
-## docker run --gpus all -it --rm gpu-mobius /bin/bash
-## docker run --gpus all -it --rm -p 8888:8888 -v "$(pwd)":/workspace gpu-mobius
+## docker build -f GPU.Dockerfile -t mobius-gpu .
+## docker run --gpus all -it --rm mobius-gpu /bin/bash
+## docker run --gpus all -it --rm -p 8888:8888 -v "$(pwd)":/workspace mobius-gpu
