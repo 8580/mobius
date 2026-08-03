@@ -1,14 +1,52 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Problem
+# Problem  (multi-objective fix)
+#
+# Replaces mobius/optimizers/problem.py.
+#
+# WHY THIS FILE IS HERE
+# ---------------------
+# Multi-objective SequenceGA is broken on the develop branch, independently of
+# any caching. `Problem._evaluate` does:
+#
+#     if self._acq_fun.maximize:
+#         acq_values *= -1
+#
+# `_AcquisitionFunction.maximize` returns `self._maximize`, which for a
+# multi-objective acquisition function is an ndarray - e.g.
+# `ExpectedImprovement([gp_a, gp_b], maximize=[False, False])` gives
+# `array([False, False])`. Using an array in a boolean context raises:
+#
+#     ValueError: The truth value of an array with more than one element is
+#     ambiguous. Use a.any() or a.all()
+#
+# This fires on the first GA generation (the `_pre_evaluation` branch, which
+# always runs once), so every multi-objective run dies immediately. Verified
+# against the stock code with a stock uncached embedder, so it is not caused by
+# the caching work - `examples/multi_objectives.ipynb` hits it too.
+#
+# There is a second, quieter problem on the same lines. The shift
+#
+#     acq_values += np.abs(np.min(acq_values)) + (np.max(acq_values) - np.min(acq_values))
+#
+# takes min and max over the WHOLE array. With one objective that is the single
+# column and is correct. With several objectives it mixes their scales, so an
+# objective measured in nanomolar and one measured as a log ratio get a shared
+# offset driven by whichever has the wider range. The intent - make the seeded
+# experimental values worse than anything the GA will later propose - only
+# holds per objective.
+#
+# Both are fixed below, column by column. Single-objective behaviour is
+# bit-identical to the stock code (one column, so per-column and whole-array
+# reductions coincide); there is a regression test for that.
 #
 
 import numpy as np
-from pymoo.core.problem import Problem
+from pymoo.core.problem import Problem as PymooProblem
 
 
-class Problem(Problem):
+class Problem(PymooProblem):
     """
     Class to define Single/Multi/Many-Objectives SequenceGA problem.
     """
@@ -36,7 +74,8 @@ class Problem(Problem):
         else:
             n_ieq_constr = len(filters)
 
-        super().__init__(n_var=1, n_obj=acq_fun.number_of_objectives, n_ieq_constr=n_ieq_constr)
+        super().__init__(n_var=1, n_obj=acq_fun.number_of_objectives,
+                         n_ieq_constr=n_ieq_constr)
 
         self._prior_data = {p: s for p, s in zip(sequences, scores)}
         self._acq_fun = acq_fun
@@ -61,22 +100,39 @@ class Problem(Problem):
             # For the first GA generation, we use the experimental scores
             # then we will use the acquisition scores from the surrogate models.
             try:
-                acq_values = np.array([self._prior_data[p] for p in sequences])
+                acq_values = np.array([self._prior_data[p] for p in sequences], dtype=float)
             except KeyError:
-                msg = f'Some sequences not found in the input experimental data. '
+                msg = 'Some sequences not found in the input experimental data. '
                 msg += 'Did you forget to turn on the eval mode?'
                 raise RuntimeError(msg)
-            
-            # We want to shift all the experimental scores in the opposite direction
-            # so that the sequences generated during the optimization will have 
-            # better (meaning lower) acquisition scores than the experimental ones.
-            # If we are maximizing, we first flip the values, so the minimum becomes 
-            # the maximum, and vice versa.
-            if self._acq_fun.maximize:
-                acq_values *= -1
-            # Finally we shift the acquisition scores to the right, the maximum 
-            # acquisition score becomes now the minimum, and superior than zeros.
-            acq_values += np.abs(np.min(acq_values)) + (np.max(acq_values) - np.min(acq_values))
+
+            # Always work column-wise: (n_sequences, n_objectives).
+            single_column = acq_values.ndim == 1
+            if single_column:
+                acq_values = acq_values.reshape(-1, 1)
+
+            # `maximize` is a scalar bool for one objective and an ndarray for
+            # several - atleast_1d makes both cases indexable.
+            maximize = np.atleast_1d(self._acq_fun.maximize)
+
+            for i in range(acq_values.shape[1]):
+                column = acq_values[:, i]
+
+                # We want to shift the experimental scores in the opposite
+                # direction so that sequences generated during the optimization
+                # have better (i.e. lower) acquisition scores than the
+                # experimental ones. If we are maximizing this objective, flip
+                # it first so the minimum becomes the maximum and vice versa.
+                if maximize[i]:
+                    column = column * -1
+
+                # Then shift to the right, per objective, so the maximum
+                # becomes the minimum and everything stays above zero.
+                spread = np.max(column) - np.min(column)
+                acq_values[:, i] = column + np.abs(np.min(column)) + spread
+
+            if single_column:
+                acq_values = acq_values.ravel()
 
             # Turn off automatically the pre-evaluation mode
             # Now it will use the acquisition scores from the surrogate models
