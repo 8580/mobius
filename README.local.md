@@ -16,5 +16,9 @@ docker run --runtime=nvidia --gpus all -it mobius-gpu /bin/bash
 docker network create --internal privatenet
 docker run --runtime=nvidia --gpus all -v $(pwd)/models:/home/app/models -v $(pwd)/data:/home/app/data --env HF_HOME='/home/app/models' -it mobius-gpu python3 ./data/run.py
 docker run --network=privatenet --runtime=nvidia --gpus all -v $(pwd)/models:/home/app/models -v $(pwd)/data:/home/app/data --env HF_HOME='/home/app/models' -it mobius-gpu /bin/bash
+```
 
+
+```bash
+docker run --gpus all -it --rm -p 8888:8888 -v "$(pwd)":/workspace gpu-mobius
 ```

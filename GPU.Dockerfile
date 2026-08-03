@@ -7,24 +7,7 @@ FROM pytorch/pytorch:2.4.0-cuda12.4-cudnn9-devel
 #
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git
-#    python3 \
-#    python3-dev \
-#    python3-pip \
-#    git \
-#    build-essential \
-#    ca-certificates \
-#    curl \
-#    wget \
-#	bash
-#    #bash \
     #&& rm -rf /var/lib/apt/lists/*
-
-#COPY gpu_requirements.txt .
-#RUN pip install -r gpu_requirements.txt
-
-#COPY mobius_jupyter_requirements.txt .
-#RUN pip install -r mobius_jupyter_requirements.txt --no-build-isolation
-
 
 WORKDIR /opt
 
@@ -36,24 +19,20 @@ COPY requirements.txt .
 RUN python -m pip install -r requirements.txt --no-build-isolation
 
 
-COPY mobius /opt/
-#RUN git clone https://git.scicore.unibas.ch/schwede/mobius.git
-#WORKDIR /opt/mobius
-#RUN pip install .
-
+COPY . /opt/mobius/
+WORKDIR /opt/mobius
 RUN python -m pip install . 
 WORKDIR /
 
 RUN pip install jupyterlab matplotlib scikit-learn
 ## Expose the default Jupyter port
 EXPOSE 8888
-
+#
 ## Start JupyterLab on container launch
 ## --ip=0.0.0.0 allows connections from outside the container
 ## --allow-root allows it to run if you don't map a custom non-root user
 CMD ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root", "--NotebookApp.token=''"]
 
-
-# docker build -f GPU.Dockerfile -t gpu-mobius .
-# docker run --gpus all -it --rm gpu-mobius /bin/bash
-# docker run --gpus all -it --rm -p 8888:8888 -v "$(pwd)":/workspace gpu-mobius
+## docker build -f GPU.Dockerfile -t gpu-mobius .
+## docker run --gpus all -it --rm gpu-mobius /bin/bash
+## docker run --gpus all -it --rm -p 8888:8888 -v "$(pwd)":/workspace gpu-mobius
