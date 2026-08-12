@@ -18,6 +18,7 @@ from .transforms import Graph
 from .optimizers import SequenceGA, CachedSequenceGA, RandomGA
 from .optimizers import Pool
 from .surrogate_models import GPModel, GPLLModel, CachedGPLLModel, DummyModel, RFModel, GPGKModel, GPGNNModel
+from .surrogate_models import CensoredEMGPModel, SchmeeHahnGPModel, TobitGPModel
 from .embeddings import ProteinEmbedding, ChemicalEmbedding, CachedProteinEmbedding
 from .generators import monomers_scanning, alanine_scanning, random_monomers_scanning, properties_scanning, scrumbled_scanning, homolog_scanning
 from .kernels import TanimotoSimilarityKernel, CosineSimilarityKernel
@@ -60,4 +61,5 @@ __all__ = ['VirtualTarget', 'ForceField',
            'convert_FASTA_to_HELM', 'convert_HELM_to_FASTA',
            'read_pssm_file', 'global_min_pssm_score', 
            'sequence_to_mutations',
-           'generate_biopolymer_design_protocol_from_probabilities', 'write_design_protocol_from_polymers']
+           'generate_biopolymer_design_protocol_from_probabilities', 'write_design_protocol_from_polymers',
+           'CensoredEMGPModel', 'SchmeeHahnGPModel', 'TobitGPModel']
