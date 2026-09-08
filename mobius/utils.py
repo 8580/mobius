@@ -286,7 +286,7 @@ def is_fasta_sequence(sequence):
         True if the sequence is in FASTA format, False otherwise.
 
     """
-    return re.match('^[^{}\[\].:,;=\$\-\(\)\+\*\n]+$', sequence)
+    return re.match(r'^[^{}\[\].:,;=\$\-\(\)\+\*\n]+$', sequence)
 
 
 def is_helm_sequence(sequence):
@@ -307,7 +307,7 @@ def is_helm_sequence(sequence):
         True if the sequence is in HELM format, False otherwise.
 
     """
-    return re.match('^[^>\n]*\{[^>\n]+\}[^>\n]*\$*\$\$\$(V2\.0)?$', sequence)
+    return re.match(r'^[^>\n]*\{[^>\n]+\}[^>\n]*\$*\$\$\$(V2\.0)?$', sequence)
 
 
 def guess_input_formats(sequences):
@@ -584,7 +584,7 @@ def parse_helm(polymer):
     if connections:
         for connection in connections.split('|'):
             # Look for "PolymerID,PolymerID,X:X-X:X" pattern in connections
-            if not re.search("\w+,\w+,\w+:\w+-\w+:\w+", connection):
+            if not re.search(r"\w+,\w+,\w+:\w+-\w+:\w+", connection):
                 raise ValueError(f'Invalid connections "{connection}" for HELM string "{polymer}"')
             
             source_id, target_id, con = connection.split(',')

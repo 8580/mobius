@@ -8,6 +8,7 @@ import botorch
 import gpytorch
 import numpy as np
 import torch
+import copy
 from botorch.fit import fit_gpytorch_mll
 from sklearn.exceptions import NotFittedError
 
@@ -66,6 +67,12 @@ class GPModel(_SurrogateModel):
                 raise ValueError("The noise prior must be an instance of gpytorch.priors.Prior.")
 
         self._kernel = kernel
+        # `fit` reuses this kernel instance, so a second call would restart
+        # `fit_gpytorch_mll` from the previously converged hyperparameters.
+        # scipy_minimize then terminates ABNORMAL and botorch raises
+        # ModelFittingError, which makes GPModel.fit effectively single-use.
+        # Snapshot the initial state so every fit starts from the same point.
+        self._kernel_init_state = copy.deepcopy(kernel.state_dict())
         self._transform = transform
         self._noise_prior = noise_prior
         self._missing_values = missing_values
@@ -101,6 +108,11 @@ class GPModel(_SurrogateModel):
         # Make sure that inputs are numpy arrays, keep a persistant copy
         self._X_train = np.asarray(X_train).copy()
         self._y_train = np.asarray(y_train).copy()
+
+        # Restart hyperparameter optimisation from the initial state.
+        if getattr(self, '_kernel_init_state', None) is not None:
+            self._kernel.load_state_dict(copy.deepcopy(self._kernel_init_state))
+
         if y_noise is not None:
             self._y_noise = np.asarray(y_noise).copy()
 

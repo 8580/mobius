@@ -17,7 +17,7 @@ from .transforms import MHFingerprint, Map4Fingerprint, MorganFingerprint
 from .transforms import Graph
 from .optimizers import SequenceGA, CachedSequenceGA, RandomGA
 from .optimizers import Pool
-from .surrogate_models import GPModel, GPLLModel, CachedGPLLModel, DummyModel, RFModel, GPGKModel, GPGNNModel
+from .surrogate_models import GPModel, GPLLModel, CachedGPLLModel, DummyModel, RFModel, GPGKModel, GPGNNModel, CensoredEMGPModel
 from .embeddings import ProteinEmbedding, ChemicalEmbedding, CachedProteinEmbedding
 from .generators import monomers_scanning, alanine_scanning, random_monomers_scanning, properties_scanning, scrumbled_scanning, homolog_scanning
 from .kernels import TanimotoSimilarityKernel, CosineSimilarityKernel
@@ -38,7 +38,7 @@ __all__ = ['VirtualTarget', 'ForceField',
            'LinearPeptideEmulator', 'FindMe',
            'Mobius',
            'Planner',
-           'GPModel', 'GPLLModel', 'CachedGPLLModel', 'DummyModel', 'RFModel', 'GPGKModel', 'GPGNNModel',
+           'GPModel', 'GPLLModel', 'CachedGPLLModel', 'DummyModel', 'RFModel', 'GPGKModel', 'GPGNNModel', 'CensoredEMGPModel',
            'ProteinEmbedding', 'ChemicalEmbedding', 'CachedProteinEmbedding',
            'TanimotoSimilarityKernel', 'CosineSimilarityKernel',
            'ExpectedImprovement', 'LogExpectedImprovement',
@@ -50,11 +50,12 @@ __all__ = ['VirtualTarget', 'ForceField',
            'SequenceGA', 'CachedSequenceGA', 'RandomGA', 'Pool',
            'monomers_scanning', 'alanine_scanning', 'random_monomers_scanning', 'properties_scanning', 
            'scrumbled_scanning', 'homolog_scanning',
-           'RosettaScorer', 'DamiettaScorer', 'InverseFolding', 'VinaScorer',
-           'plot_results',
+           'RosettaScorer', 'DamiettaScorer', 'InverseFolding',
+           #'VinaScorer',
+           #'plot_results',
            'parse_helm', 'build_helm_string', 'get_scaffold_from_helm_string',
            'affinity_binding_to_energy', 'energy_to_affinity_binding', 
-           'generate_random_linear_polymers'
+           'generate_random_linear_polymers',
            'ic50_to_pic50', 'pic50_to_ic50',
            'PeptideSelfAggregationFilter', 'PeptideSolubilityFilter',
            'convert_FASTA_to_HELM', 'convert_HELM_to_FASTA',
