@@ -37,7 +37,7 @@ scipy
 sphinx==6.2.1
 sphinx_rtd_theme
 tqdm
-transformers
+transformers<5
 grakel
 mhfp
 meeko
